@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/limingjie/libcsvmm.svg?branch=master)](https://travis-ci.org/limingjie/libcsvmm)
 
 # libcsvmm
-Yet another CSV library in C++.
+Yet another CSV library in C++. (In development...)
 
 ## Definition of The CSV Format
 [rfc4180](http://tools.ietf.org/rfc/rfc4180.txt)
