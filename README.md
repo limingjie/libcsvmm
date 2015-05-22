@@ -20,29 +20,34 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
 ```
 
 ## Tokenization
-Create an empty record.
+
+### Process input stream
+- Create an empty new field and an empty new record.
+- Switch to [data state](#data-state).
+- If the stream ends, switch to [EOF](#eof).
 
 ### Data state
 Consume the next input character:
 - **"," (U+002C)**
-  - Emit an empty field.
+  - [Emit the current field](#emit-the-current-field).
 - **CR (U+000D)**
-  - Ignore the character.
+  - Ignore the current input character.
 - **LF (U+000A)**
-  - Emit an empty field. Emit current record.
+  - [Emit the current field](#emit-the-current-field).
+  - [Emit the current record](#emit-the-current-record).
 - **U+0022 QUOTATION MARK (")**
-  - Create a new field. Switch to [quoted field state](#quoted-field-state).
+  - Switch to [quoted field state](#quoted-field-state).
 - **Anything else**
-  - Create a new field. Switch to [field state](#field-state). Reconsume the current input character.
+  - Reconsume the current input character.
+  - Switch to [field state](#field-state).
 
 ### Field state
 Consume the next input character:
 - **"," (U+002C)**
-  - Emit current field. Switch to [data state](#data-state).
 - **CR (U+000D)**
-  - Ignore the character.
 - **LF (U+000A)**
-  - Emit current field. Emit current record. Switch to [data state](#data-state).
+  - Reconsume the current input character.
+  - Switch to [data state](#data-state).
 - **Anything else**
   - Append the current input character to the current field.
 
@@ -51,7 +56,7 @@ Consume the next input character:
 - **U+0022 QUOTATION MARK (")**
   - Switch to [quoted field quote state](#quoted-field-quote-state).
 - **CR (U+000D)**
-  - Ignore the character.
+  - Ignore the current input character.
 - **LF (U+000A)**
   - Append CRLF to the current field.
 - **Anything else**
@@ -59,13 +64,29 @@ Consume the next input character:
 
 ### Quoted field quote state
 Consume the next input character:
-- **U+0022 QUOTATION MARK (")**
-  - Append U+0022 QUOTATION MARK (") to the current field. Switch to [quoted field state](#quoted-field-state).
 - **"," (U+002C)**
-  - Emit current field. Switch to [data state](#data-state).
 - **CR (U+000D)**
-  - Ignore the character.
 - **LF (U+000A)**
-  - Emit current field. Emit current record. Switch to [data state](#data-state).
+  - Reconsume the current input character.
+  - Switch to [data state](#data-state).
+- **U+0022 QUOTATION MARK (")**
+  - Append the current input character to the current field.
+  - Switch to [quoted field state](#quoted-field-state).
 - **Anything else**
-  - Parse error. Treat it as text, append to the current field. Switch to [field state](#field-state).
+  - Parse error.
+  - Treat it as text, append to the current field.
+  - Switch to [field state](#field-state).
+
+### Emit the current field
+- Add the current field to the current record.
+- Create an empty new field.
+
+### Emit the current record
+- Add the current record to CSV file.
+- Create an empty new record.
+
+### EOF
+- If the current field is not empty, or the last input character is COMMA.
+  - Add the current field to the current record.
+- If the current record is not empty.
+  - Add the current record to CSV file.
