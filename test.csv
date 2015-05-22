@@ -1,0 +1,14 @@
+1997,Ford,E350,"ac, abs, moon",3000.00
+1999,Chevy,"Venture ""Extended Edition""","",4900.00
+1999,Chevy,"Venture ""Extended Edition, Very Large""",,5000.00
+1996,Jeep,Grand Cherokee,"MUST SELL!
+air, moon roof, loaded",4799.00
+
+other cases
+"quoted string "followed by non-quoted,comma at the end of line,
+ "quoted by start with space","quoted followed by 2 spaces"  
+"""""""""""""""""",many quotes...
+""""""""""""""""",many quotes...
+blablabla
+what?
+end"

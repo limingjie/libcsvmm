@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/limingjie/libcsvmm.svg?branch=master)](https://travis-ci.org/limingjie/libcsvmm)
+
 # libcsvmm
 Yet another CSV library in C++.
 
