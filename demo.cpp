@@ -10,6 +10,8 @@
 #include <sstream>
 #include <string>
 
+#include "csvmm.hpp"
+
 void usage()
 {
     std::cerr
@@ -21,123 +23,12 @@ void usage()
         << std::endl;
 }
 
-enum state_type
-{
-    state_data,
-    state_field,
-    state_quoted_field,
-    state_quoted_field_quote
-};
-
-void emit_field(std::string &field)
-{
-    std::cout << "Field : [[" << field << "]]\n";
-    field.clear();
-}
-
-void emit_record()
-{
-    std::cout << "--\n";
-}
-
 void parse_csv(std::istream &is)
 {
-    char c;
-    bool reconsume = false;
-
-    std::string field;
-
-    state_type state = state_data;
-    while (reconsume || is.get(c))
-    {
-        reconsume = false;
-
-        switch (state)
-        {
-        case state_data:
-            switch (c)
-            {
-            case ',':
-                emit_field(field);
-                break;
-            case '\r':
-                // omit
-                break;
-            case '\n':
-                emit_field(field);
-                emit_record();
-                break;
-            case '\"':
-                state = state_quoted_field;
-                break;
-            default:
-                reconsume = true;
-                state = state_field;
-                break;
-            }
-            break;
-        case state_field:
-            switch (c)
-            {
-            case ',':
-            case '\r':
-            case '\n':
-                reconsume = true;
-                state = state_data;
-                break;
-            default:
-                field.push_back(c);
-                break;
-            }
-            break;
-        case state_quoted_field:
-            switch (c)
-            {
-            case '\"':
-                state = state_quoted_field_quote;
-                break;
-            case '\r':
-                // omit
-                break;
-            case '\n':
-                field.push_back('\r');
-                field.push_back('\n');
-                break;
-            default:
-                field.push_back(c);
-                break;
-            }
-            break;
-        case state_quoted_field_quote:
-            switch (c)
-            {
-            case ',':
-            case '\r':
-            case '\n':
-                reconsume = true;
-                state = state_data;
-                break;
-            case '\"':
-                field.push_back('\"');
-                state = state_quoted_field;
-                break;
-            default:
-                // parse error.
-                field.push_back(c);
-                state = state_field;
-                break;
-            }
-            break;
-        default:
-            std::cerr << "what?\n";
-        }
-    }
-
-    // EOF
-    emit_field(field);
-    emit_record();
-
-    std::cout.flush();
+    csvmm csv;
+    csv.read(is);
+    csv.write(std::cout);
+    csv.write("binary.csv");
 }
 
 void read_std_input()
