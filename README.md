@@ -95,8 +95,8 @@ Consume the next input character:
 - **"," (U+002C)**
 - **CR (U+000D)**
 - **LF (U+000A)**
-  - Reconsume the current input character.
   - Switch to [data state](#data-state).
+  - Reconsume the current input character.
 - **U+0022 QUOTATION MARK (")**
   - Append the current input character to the current field.
   - Switch to [quoted field state](#quoted-field-state).
@@ -105,6 +105,7 @@ Consume the next input character:
   - [Emit the current record](#emit-the-current-record).
   - End of tokenization.
 - **Anything else**
+  - Parse error. Treat the current input character as text, append to the current field.
   - Switch to [field state](#field-state).
 
 ### Quoted field CR state
