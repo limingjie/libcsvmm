@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -29,9 +30,11 @@ private:
     void _emit_field(std::string &field, record_t &record);
     void _emit_record(record_t &record);
 
+    void _read(std::istream &is);
+
     // set binary to true will insert CR before LF,
     // it should only be set, if the ostream is in binary mode.
-    bool _write(std::ostream &os, bool binary);
+    void _write(std::ostream &os, bool binary);
     void _write_record(std::ostream &os, const record_t &record, bool binary);
     void _write_field(std::ostream &os, const std::string &field, bool binary);
 
@@ -43,12 +46,27 @@ public:
 
     bool read(std::istream &is);
 
+    // read csv file, support CRLF or LF newline.
+    bool read(const std::string &filename);
+
     // non-binary output, newline depends on system.
     bool write(std::ostream &os);
 
-    // binary output, make sure newline as CRLF.
+    // write csv file, make sure newline as CRLF.
     bool write(const std::string &filename);
 
-    // TODO: counts
-    std::string get_field(size_t row, size_t column);
+    // return number records.
+    size_t size();
+
+    // return number of fields of nth record.
+    size_t size(size_t row);
+
+    // serialize csv to string.
+    std::string to_string();
+
+    // serialize nth record to string.
+    std::string to_string(size_t row);
+
+    // serialize mth field of nth record to string.
+    std::string to_string(size_t row, size_t column);
 };

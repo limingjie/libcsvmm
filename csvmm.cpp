@@ -12,7 +12,7 @@ csvmm::csvmm()
 
 }
 
-bool csvmm::read(std::istream &is)
+void csvmm::_read(std::istream &is)
 {
     std::string field;
     record_t record;
@@ -116,8 +116,6 @@ bool csvmm::read(std::istream &is)
     {
         _emit_record(record);
     }
-
-    return true;
 }
 
 void csvmm::_emit_field(std::string &field, record_t &record)
@@ -132,21 +130,14 @@ void csvmm::_emit_record(record_t &record)
     record.clear();
 }
 
-bool csvmm::_write(std::ostream &os, bool binary)
+void csvmm::_write(std::ostream &os, bool binary)
 {
-    if (!os.good())
-    {
-        return false;
-    }
-
     for (auto it = _csv.cbegin(); it != _csv.cend(); ++it)
     {
         _write_record(os, *it, binary);
     }
 
     os.flush();
-
-    return true;
 }
 
 void csvmm::_write_record(std::ostream &os, const record_t &record, bool binary)
@@ -199,28 +190,102 @@ void csvmm::_write_field(std::ostream &os, const std::string &field, bool binary
     }
 }
 
+bool csvmm::read(std::istream &is)
+{
+    if (is)
+    {
+        _read(is);
+        return true;
+    }
+
+    return false;
+}
+
+bool csvmm::read(const std::string &filename)
+{
+    std::ifstream ifs(filename);
+
+    if (ifs)
+    {
+        _read(ifs);
+        ifs.close();
+
+        return true;
+    }
+
+    return false;
+}
+
 bool csvmm::write(std::ostream &os)
 {
-    return _write(os, false);
+    if (os)
+    {
+        _write(os, false);
+        return true;
+    }
+
+    return false;
 }
 
 bool csvmm::write(const std::string &filename)
 {
     std::ofstream ofs(filename, std::ios_base::out | std::ios_base::binary);
-    bool rc = _write(ofs, true);
-    ofs.close();
 
-    return rc;
+    if (ofs)
+    {
+        _write(ofs, true);
+        ofs.close();
+
+        return true;
+    }
+
+    return false;
 }
 
-std::string csvmm::get_field(size_t row, size_t column)
+size_t csvmm::size()
 {
-    if (row >= _csv.size() || column >= _csv[row].size())
+    return _csv.size();
+}
+
+size_t csvmm::size(size_t row)
+{
+    if (row < _csv.size())
     {
-        return "";
+        return _csv[row].size();
     }
-    else
+
+    return 0;
+}
+
+std::string csvmm::to_string()
+{
+    std::ostringstream oss;
+
+    _write(oss, false);
+
+    return oss.str();
+}
+
+std::string csvmm::to_string(size_t row)
+{
+    std::ostringstream oss;
+
+    if (row < _csv.size())
     {
-        return _csv[row][column];
+        _write_record(oss, _csv[row], false);
     }
+
+    return oss.str();
+}
+
+std::string csvmm::to_string(size_t row, size_t column)
+{
+    std::ostringstream oss;
+
+    if (row < _csv.size() && column < _csv[row].size())
+    {
+        _write_field(oss, _csv[row][column], false);
+    }
+
+    return oss.str();
 }
