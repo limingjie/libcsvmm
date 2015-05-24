@@ -137,72 +137,78 @@ bool csvmm::_write(std::ostream &os, bool binary)
     if (!os.good())
         return false;
 
-    csv_t::const_iterator r_it;
-    record_t::const_iterator f_it;
-    std::string::const_iterator s_it;
-    std::string field;
-
-    // loop records
-    for (r_it = _csv.cbegin(); r_it != _csv.cend(); ++r_it)
+    csv_t::const_iterator it;
+    for (it = _csv.cbegin(); it != _csv.cend(); ++it)
     {
-        // loop fields
-        for (f_it = (*r_it).cbegin(); f_it != (*r_it).cend(); ++f_it)
-        {
-            // if field contains double quote, quote it and escape " with "";
-            if ((*f_it).find('\"') != std::string::npos)
-            {
-                field = '\"';
-
-                for (s_it = (*f_it).cbegin(); s_it != (*f_it).cend(); ++s_it)
-                {
-                    if ((*s_it) == '\"')
-                        field.push_back('\"');
-
-                    field.push_back(*s_it);
-                }
-
-                field.push_back('\"');
-            }
-            // if field contains comma or newline, quote it.
-            else if ((*f_it).find_first_of(",\n") != std::string::npos)
-            {
-                field = '\"' + *f_it + '\"';
-            }
-            else
-            {
-                field = *f_it;
-            }
-
-            // output comma before all fields except the first one.
-            if (f_it != (*r_it).cbegin())
-                os << ',';
-
-            // output newline as CRLF in binary mode.
-            if (binary && field.find('\n') != std::string::npos)
-            {
-                for (s_it = field.cbegin(); s_it != field.cend(); ++s_it)
-                {
-                    if ((*s_it) == '\n')
-                        os << '\r';
-
-                    os << *s_it;
-                }
-            }
-            else
-            {
-                os << field;
-            }
-        }
-
-        if (binary)
-            os << '\r';
-
-        os << '\n';
+        _write_record(os, *it, binary);
     }
 
     os.flush();
 
     return true;
+}
+
+void csvmm::_write_record(std::ostream &os, const record_t &record, bool binary)
+{
+    record_t::const_iterator it;
+    for (it = record.cbegin(); it != record.cend(); ++it)
+    {
+        if (it != record.cbegin())
+            os << ',';
+
+        _write_field(os, *it, binary);
+    }
+
+    if (binary)
+        os << '\r';
+
+    os << '\n';
+}
+void csvmm::_write_field(std::ostream &os, const std::string &field, bool binary)
+{
+    std::string::const_iterator it;
+    std::string escaped_field;
+
+    // if escaped_field contains double quote, quote it and escape " with "";
+    if (field.find('\"') != std::string::npos)
+    {
+        escaped_field = '\"';
+
+        for (it = field.cbegin(); it != field.cend(); ++it)
+        {
+            if (*it == '\"')
+                escaped_field.push_back('\"');
+
+            escaped_field.push_back(*it);
+        }
+
+        escaped_field.push_back('\"');
+    }
+    // if escaped_field contains comma or newline, quote it.
+    else if (field.find_first_of(",\n") != std::string::npos)
+    {
+        escaped_field = '\"' + field + '\"';
+    }
+    else
+    {
+        escaped_field = field;
+    }
+
+    // output newline as CRLF in binary mode.
+    if (binary && escaped_field.find('\n') != std::string::npos)
+    {
+        for (it = escaped_field.cbegin(); it != escaped_field.cend(); ++it)
+        {
+            if (*it == '\n')
+                os << '\r';
+
+            os << *it;
+        }
+    }
+    else
+    {
+        os << escaped_field;
+    }
 }
 
 bool csvmm::write(std::ostream &os)

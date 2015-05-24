@@ -32,6 +32,8 @@ private:
     // set binary to true will insert CR before LF,
     // it should only be set, if the ostream is in binary mode.
     bool _write(std::ostream &os, bool binary);
+    void _write_record(std::ostream &os, const record_t &record, bool binary);
+    void _write_field(std::ostream &os, const std::string &field, bool binary);
 
 public:
     csvmm();
