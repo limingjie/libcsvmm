@@ -34,5 +34,5 @@ csvmm.o: csvmm.cpp csvmm.hpp
 
 clean:
 	@echo "==>Cleaning..."
-	rm -rf demo.o
+	rm -rf demo.o csvmm.o
 	rm -rf demo$(X)

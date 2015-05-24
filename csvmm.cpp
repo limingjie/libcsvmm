@@ -135,10 +135,11 @@ void csvmm::_emit_record(record_t &record)
 bool csvmm::_write(std::ostream &os, bool binary)
 {
     if (!os.good())
+    {
         return false;
+    }
 
-    csv_t::const_iterator it;
-    for (it = _csv.cbegin(); it != _csv.cend(); ++it)
+    for (auto it = _csv.cbegin(); it != _csv.cend(); ++it)
     {
         _write_record(os, *it, binary);
     }
@@ -150,11 +151,12 @@ bool csvmm::_write(std::ostream &os, bool binary)
 
 void csvmm::_write_record(std::ostream &os, const record_t &record, bool binary)
 {
-    record_t::const_iterator it;
-    for (it = record.cbegin(); it != record.cend(); ++it)
+    for (auto it = record.cbegin(); it != record.cend(); ++it)
     {
         if (it != record.cbegin())
+        {
             os << ',';
+        }
 
         _write_field(os, *it, binary);
     }
@@ -166,48 +168,34 @@ void csvmm::_write_record(std::ostream &os, const record_t &record, bool binary)
 }
 void csvmm::_write_field(std::ostream &os, const std::string &field, bool binary)
 {
-    std::string::const_iterator it;
-    std::string escaped_field;
-
-    // if escaped_field contains double quote, quote it and escape " with "";
-    if (field.find('\"') != std::string::npos)
+    if (field.find_first_of(",\"\r\n") != std::string::npos)
     {
-        escaped_field = '\"';
+        os << '\"';
 
-        for (it = field.cbegin(); it != field.cend(); ++it)
+        for (auto it = field.cbegin(); it != field.cend(); ++it)
         {
             if (*it == '\"')
-                escaped_field.push_back('\"');
-
-            escaped_field.push_back(*it);
-        }
-
-        escaped_field.push_back('\"');
-    }
-    // if escaped_field contains comma or newline, quote it.
-    else if (field.find_first_of(",\n") != std::string::npos)
-    {
-        escaped_field = '\"' + field + '\"';
-    }
-    else
-    {
-        escaped_field = field;
-    }
-
-    // output newline as CRLF in binary mode.
-    if (binary && escaped_field.find('\n') != std::string::npos)
-    {
-        for (it = escaped_field.cbegin(); it != escaped_field.cend(); ++it)
-        {
-            if (*it == '\n')
+            {
+                os << '\"';
+            }
+            else if (*it =='\r')
+            {
+                // omit '\r'
+                continue;
+            }
+            else if (binary && *it =='\n')
+            {
                 os << '\r';
+            }
 
             os << *it;
         }
+
+        os << '\"';
     }
     else
     {
-        os << escaped_field;
+        os << field;
     }
 }
 
