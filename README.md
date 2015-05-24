@@ -35,46 +35,38 @@ Consume the next input character:
   - [Emit the current field](#emit-the-current-field).
   - [Emit the current record](#emit-the-current-record).
   - Switch to [data CR state](#data-cr-state).
-- **LF (U+000A)**
-  - Unix/Linux newline.
+- **LF (U+000A) - Unix/Linux newline**
   - [Emit the current field](#emit-the-current-field).
   - [Emit the current record](#emit-the-current-record).
 - **U+0022 QUOTATION MARK (")**
   - Switch to [quoted field state](#quoted-field-state).
 - **EOF**
-  - If the last input character is ',':
-    - [Emit the current field](#emit-the-current-field).
-  - If the current record is not null:
-    - [Emit the current record](#emit-the-current-record).
+  - If the last input character is **"," (U+002C)**, [emit the current field](#emit-the-current-field).
+  - If the current record is not null, [emit the current record](#emit-the-current-record).
   - End of tokenization.
 - **Anything else**
-  - Reconsume the current input character.
   - Switch to [field state](#field-state).
+  - Reconsume the current input character.
 
 ### Data CR state
 (Old Mac newline compatibility.)
+
 Consume the next input character:
-- **LF (U+000A)**
-  - Windows newline.
+- **LF (U+000A) - Windows newline**
   - Switch to [data state](#data-state).
 - **EOF**
-  - If the current field is not null:
-    - [Emit the current field](#emit-the-current-field).
-  - If the current record is not null:
-    - [Emit the current record](#emit-the-current-record).
   - End of tokenization.
-- **Anything else**
-  - Old Mac newline.
-  - Reconsume the current input character.
+- **Anything else - Old Mac newline**
   - Switch to [data state](#data-state).
+  - Reconsume the current input character.
 
 ### Field state
 Consume the next input character:
 - **"," (U+002C)**
 - **CR (U+000D)**
 - **LF (U+000A)**
-  - Reconsume the current input character.
   - Switch to [data state](#data-state).
+  - Reconsume the current input character.
 - **EOF**
   - [Emit the current field](#emit-the-current-field).
   - [Emit the current record](#emit-the-current-record).
@@ -89,8 +81,7 @@ Consume the next input character:
 - **CR (U+000D)**
   - Append CRLF to the current field.
   - Switch to [quoted field CR state](#quoted-field-cr-state).
-- **LF (U+000A)**
-  - Unix/Linux newline.
+- **LF (U+000A) - Unix/Linux newline**
   - Append CRLF to the current field.
 - **EOF**
   - [Emit the current field](#emit-the-current-field).
@@ -114,22 +105,23 @@ Consume the next input character:
   - [Emit the current record](#emit-the-current-record).
   - End of tokenization.
 - **Anything else**
-  - Parse error.
-  - Treat it as text, append to the current field.
   - Switch to [field state](#field-state).
 
 ### Quoted field CR state
 (Old Mac newline compatibility.)
+
 Consume the next input character:
 - **LF (U+000A)**
   - Windows newline.
   - Switch to [quoted field state](#quoted-field-state).
 - **EOF**
+  - If the current field is not null, [emit the current field](#emit-the-current-field).
+  - If the current record is not null, [emit the current record](#emit-the-current-record).
   - End of tokenization.
 - **Anything else**
   - Old Mac newline.
-  - Reconsume the current input character.
   - Switch to [quoted field state](#quoted-field-state).
+  - Reconsume the current input character.
 
 ### Emit the current field
 - Add the current field to the current record.

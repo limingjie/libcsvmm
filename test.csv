@@ -4,12 +4,6 @@
 1996,Jeep,Grand Cherokee,"MUST SELL!
 air, moon roof, loaded",4799.00
 
-other cases
-"quoted string "followed by non-quoted,comma at the end of line,
- "quoted but start with space","quoted followed by 2 spaces"  
-"""""""""""""""""",many quotes...
-""""""""""""""""",many quotes...
-blablabla
-what?
-end"
-aaa
+"quoted string" followed by text
+ "space before quotation mark"
+3 commas,,,

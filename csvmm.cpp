@@ -45,8 +45,8 @@ void csvmm::_read(std::istream &is)
                 state = _quoted_field_state;
                 break;
             default:
-                reconsume = true;
                 state = _field_state;
+                reconsume = true;
                 break;
             }
             break;
@@ -57,8 +57,8 @@ void csvmm::_read(std::istream &is)
                 state = _data_state;
                 break;
             default: // CR, old Mac newline.
-                reconsume = true;
                 state = _data_state;
+                reconsume = true;
                 break;
             }
             break;
@@ -68,8 +68,8 @@ void csvmm::_read(std::istream &is)
             case ',':
             case '\r':
             case '\n':
-                reconsume = true;
                 state = _data_state;
+                reconsume = true;
                 break;
             default:
                 field.push_back(c);
@@ -100,8 +100,8 @@ void csvmm::_read(std::istream &is)
             case ',':
             case '\r':
             case '\n':
-                reconsume = true;
                 state = _data_state;
+                reconsume = true;
                 break;
             case '\"':
                 field.push_back('\"');
@@ -121,8 +121,8 @@ void csvmm::_read(std::istream &is)
                 state = _quoted_field_state;
                 break;
             default: // CR, old Mac newline.
-                reconsume = true;
                 state = _quoted_field_state;
+                reconsume = true;
                 break;
             }
         default:

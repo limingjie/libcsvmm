@@ -24,8 +24,6 @@ void usage()
 
 void read_std_input()
 {
-    std::cerr << "Info: read_std_input" << std::endl;
-
     csvmm csv;
 
     if (csv.read(std::cin))
@@ -41,8 +39,6 @@ void read_file(const std::string &filename)
 
     if (csv.read(filename))
     {
-        std::cerr << "Info: read_file" << std::endl;
-
         csv.write(std::cout);
         csv.write("binary.csv");
     }
