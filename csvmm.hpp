@@ -48,10 +48,10 @@ public:
 
     bool read(std::istream &is);
 
-    // read csv file, support CRLF or LF newline.
+    // read csv file.
     bool read(const std::string &filename);
 
-    // non-binary output, newline depends on system.
+    // non-binary output.
     bool write(std::ostream &os);
 
     // write csv file, make sure newline as CRLF.
