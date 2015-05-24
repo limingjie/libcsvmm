@@ -57,7 +57,7 @@ public:
     // write csv file, make sure newline as CRLF.
     bool write(const std::string &filename);
 
-    // return number records.
+    // return number of records.
     size_t size();
 
     // return number of fields of nth record.
