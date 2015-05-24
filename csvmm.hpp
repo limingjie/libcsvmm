@@ -14,8 +14,8 @@
 class csvmm
 {
 private:
-    using record_t = std::vector<std::string>;
-    using csv_t    = std::vector<record_t>;
+    typedef std::vector<std::string> record_t;
+    typedef std::vector<record_t>    csv_t;
 
     enum state_type
     {
