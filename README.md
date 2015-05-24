@@ -33,7 +33,7 @@ Consume the next input character:
 - **"," (U+002C)**
   - [Emit the current field](#emit-the-current-field).
 - **CR (U+000D)**
-  - Ignore the current input character.
+  - Unix/Linux newline.
 - **LF (U+000A)**
   - [Emit the current field](#emit-the-current-field).
   - [Emit the current record](#emit-the-current-record).
@@ -42,6 +42,21 @@ Consume the next input character:
 - **Anything else**
   - Reconsume the current input character.
   - Switch to [field state](#field-state).
+
+### Data CR state
+(Old Mac newline compatibility.)
+Consume the next input character:
+- **LF (U+000A)**
+  - Windows newline.
+  - [Emit the current field](#emit-the-current-field).
+  - [Emit the current record](#emit-the-current-record).
+  - Switch to [data state](#data-state).
+- **Anything else**
+  - Old Mac newline.
+  - [Emit the current field](#emit-the-current-field).
+  - [Emit the current record](#emit-the-current-record).
+  - Reconsume the current input character.
+  - Switch to [data state](#data-state).
 
 ### Field state
 Consume the next input character:
@@ -58,7 +73,7 @@ Consume the next input character:
 - **U+0022 QUOTATION MARK (")**
   - Switch to [quoted field quote state](#quoted-field-quote-state).
 - **CR (U+000D)**
-  - Ignore the current input character.
+  - Unix/Linux newline.
 - **LF (U+000A)**
   - Append CRLF to the current field.
 - **Anything else**
@@ -78,6 +93,19 @@ Consume the next input character:
   - Parse error.
   - Treat it as text, append to the current field.
   - Switch to [field state](#field-state).
+
+### Quoted field CR state
+(Old Mac newline compatibility.)
+Consume the next input character:
+- **LF (U+000A)**
+  - Windows newline.
+  - Append CRLF to the current field.
+  - Switch to [quoted field state](#quoted-field-state).
+- **Anything else**
+  - Old Mac newline.
+  - Append CRLF to the current field.
+  - Reconsume the current input character.
+  - Switch to [quoted field state](#quoted-field-state).
 
 ### Emit the current field
 - Add the current field to the current record.

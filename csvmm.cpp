@@ -32,10 +32,10 @@ void csvmm::_read(std::istream &is)
             case ',':
                 _emit_field(field, record);
                 break;
-            case '\r':
-                // omit
+            case '\r': // CR or CRLF
+                state = _data_cr_state;
                 break;
-            case '\n':
+            case '\n': // LF, Unix/Linux newline.
                 _emit_field(field, record);
                 _emit_record(record);
                 break;
@@ -45,6 +45,22 @@ void csvmm::_read(std::istream &is)
             default:
                 reconsume = true;
                 state = _field_state;
+                break;
+            }
+            break;
+        case _data_cr_state:
+            switch (c)
+            {
+            case '\n': // CRLF, Windows newline.
+                _emit_field(field, record);
+                _emit_record(record);
+                state = _data_state;
+                break;
+            default: // CR, old Mac newline.
+                _emit_field(field, record);
+                _emit_record(record);
+                reconsume = true;
+                state = _data_state;
                 break;
             }
             break;
@@ -68,11 +84,10 @@ void csvmm::_read(std::istream &is)
             case '\"':
                 state = _quoted_field_quote_state;
                 break;
-            case '\r':
-                // omit
+            case '\r': // CR or CRLF
+                state = _quoted_field_cr_state;
                 break;
-            case '\n':
-                // field.push_back('\r');
+            case '\n': // LF, Unix/Linux newline.
                 field.push_back('\n');
                 break;
             default:
@@ -94,12 +109,25 @@ void csvmm::_read(std::istream &is)
                 state = _quoted_field_state;
                 break;
             default:
-                // parse error.
+                // parse error, treat it as text.
                 field.push_back(c);
                 state = _field_state;
                 break;
             }
             break;
+        case _quoted_field_cr_state:
+            switch (c)
+            {
+            case '\n': // CRLF, Windows newline.
+                field.push_back('\n');
+                state = _quoted_field_state;
+                break;
+            default: // CR, old Mac newline.
+                field.push_back('\n');
+                reconsume = true;
+                state = _quoted_field_state;
+                break;
+            }
         default:
             // what?
             break;

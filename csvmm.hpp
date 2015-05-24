@@ -20,9 +20,11 @@ private:
     enum state_type
     {
         _data_state,
+        _data_cr_state,
         _field_state,
         _quoted_field_state,
-        _quoted_field_quote_state
+        _quoted_field_quote_state,
+        _quoted_field_cr_state
     };
 
     csv_t _csv;
