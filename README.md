@@ -26,13 +26,14 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
 ### Process input stream
 - Create an empty new field and an empty new record.
 - Switch to [data state](#data-state).
-- If the stream ends, switch to [EOF](#eof).
 
 ### Data state
 Consume the next input character:
 - **"," (U+002C)**
   - [Emit the current field](#emit-the-current-field).
 - **CR (U+000D)**
+  - [Emit the current field](#emit-the-current-field).
+  - [Emit the current record](#emit-the-current-record).
   - Switch to [data CR state](#data-cr-state).
 - **LF (U+000A)**
   - Unix/Linux newline.
@@ -40,6 +41,12 @@ Consume the next input character:
   - [Emit the current record](#emit-the-current-record).
 - **U+0022 QUOTATION MARK (")**
   - Switch to [quoted field state](#quoted-field-state).
+- **EOF**
+  - If the last input character is ',':
+    - [Emit the current field](#emit-the-current-field).
+  - If the current record is not null:
+    - [Emit the current record](#emit-the-current-record).
+  - End of tokenization.
 - **Anything else**
   - Reconsume the current input character.
   - Switch to [field state](#field-state).
@@ -49,13 +56,15 @@ Consume the next input character:
 Consume the next input character:
 - **LF (U+000A)**
   - Windows newline.
-  - [Emit the current field](#emit-the-current-field).
-  - [Emit the current record](#emit-the-current-record).
   - Switch to [data state](#data-state).
+- **EOF**
+  - If the current field is not null:
+    - [Emit the current field](#emit-the-current-field).
+  - If the current record is not null:
+    - [Emit the current record](#emit-the-current-record).
+  - End of tokenization.
 - **Anything else**
   - Old Mac newline.
-  - [Emit the current field](#emit-the-current-field).
-  - [Emit the current record](#emit-the-current-record).
   - Reconsume the current input character.
   - Switch to [data state](#data-state).
 
@@ -66,6 +75,10 @@ Consume the next input character:
 - **LF (U+000A)**
   - Reconsume the current input character.
   - Switch to [data state](#data-state).
+- **EOF**
+  - [Emit the current field](#emit-the-current-field).
+  - [Emit the current record](#emit-the-current-record).
+  - End of tokenization.
 - **Anything else**
   - Append the current input character to the current field.
 
@@ -74,10 +87,15 @@ Consume the next input character:
 - **U+0022 QUOTATION MARK (")**
   - Switch to [quoted field quote state](#quoted-field-quote-state).
 - **CR (U+000D)**
+  - Append CRLF to the current field.
   - Switch to [quoted field CR state](#quoted-field-cr-state).
 - **LF (U+000A)**
   - Unix/Linux newline.
   - Append CRLF to the current field.
+- **EOF**
+  - [Emit the current field](#emit-the-current-field).
+  - [Emit the current record](#emit-the-current-record).
+  - End of tokenization.
 - **Anything else**
   - Append the current input character to the current field.
 
@@ -91,6 +109,10 @@ Consume the next input character:
 - **U+0022 QUOTATION MARK (")**
   - Append the current input character to the current field.
   - Switch to [quoted field state](#quoted-field-state).
+- **EOF**
+  - [Emit the current field](#emit-the-current-field).
+  - [Emit the current record](#emit-the-current-record).
+  - End of tokenization.
 - **Anything else**
   - Parse error.
   - Treat it as text, append to the current field.
@@ -101,11 +123,11 @@ Consume the next input character:
 Consume the next input character:
 - **LF (U+000A)**
   - Windows newline.
-  - Append CRLF to the current field.
   - Switch to [quoted field state](#quoted-field-state).
+- **EOF**
+  - End of tokenization.
 - **Anything else**
   - Old Mac newline.
-  - Append CRLF to the current field.
   - Reconsume the current input character.
   - Switch to [quoted field state](#quoted-field-state).
 
@@ -116,9 +138,3 @@ Consume the next input character:
 ### Emit the current record
 - Add the current record to CSV file.
 - Create an empty new record.
-
-### EOF
-- If the current field is not empty, or the last input character is COMMA.
-  - Add the current field to the current record.
-- If the current record is not empty.
-  - Add the current record to CSV file.

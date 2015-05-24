@@ -17,7 +17,7 @@ void csvmm::_read(std::istream &is)
     std::string field;
     record_t record;
 
-    char c;
+    char c = '\0';
     bool reconsume = false;
     state_type state = _data_state;
     while (reconsume || is.get(c))
@@ -33,6 +33,8 @@ void csvmm::_read(std::istream &is)
                 _emit_field(field, record);
                 break;
             case '\r': // CR or CRLF
+                _emit_field(field, record);
+                _emit_record(record);
                 state = _data_cr_state;
                 break;
             case '\n': // LF, Unix/Linux newline.
@@ -52,13 +54,9 @@ void csvmm::_read(std::istream &is)
             switch (c)
             {
             case '\n': // CRLF, Windows newline.
-                _emit_field(field, record);
-                _emit_record(record);
                 state = _data_state;
                 break;
             default: // CR, old Mac newline.
-                _emit_field(field, record);
-                _emit_record(record);
                 reconsume = true;
                 state = _data_state;
                 break;
@@ -85,6 +83,7 @@ void csvmm::_read(std::istream &is)
                 state = _quoted_field_quote_state;
                 break;
             case '\r': // CR or CRLF
+                field.push_back('\n');
                 state = _quoted_field_cr_state;
                 break;
             case '\n': // LF, Unix/Linux newline.
@@ -119,11 +118,9 @@ void csvmm::_read(std::istream &is)
             switch (c)
             {
             case '\n': // CRLF, Windows newline.
-                field.push_back('\n');
                 state = _quoted_field_state;
                 break;
             default: // CR, old Mac newline.
-                field.push_back('\n');
                 reconsume = true;
                 state = _quoted_field_state;
                 break;
@@ -135,7 +132,11 @@ void csvmm::_read(std::istream &is)
     }
 
     // EOF
-    if (!field.empty() || c == ',')
+    if (!field.empty()                     ||
+        (state == _data_state && c == ',') ||
+        state == _field_state              ||
+        state == _quoted_field_state       ||
+        state == _quoted_field_quote_state)
     {
         _emit_field(field, record);
     }
