@@ -1,7 +1,13 @@
 [![Build Status](https://travis-ci.org/limingjie/libcsvmm.svg?branch=master)](https://travis-ci.org/limingjie/libcsvmm)
 
 # libcsvmm
-Yet another CSV library in C++. (In development...)
+Yet another CSV library in C++.
+
+## Development
+- ~~Read CSV from file or std::istream.~~
+- ~~Write CSV to file or std::ostream.~~
+- ~~to_string function for CSV, record and field.~~
+- Modify CSV, remove/insert/append records/fields.
 
 ## Definition of The CSV Format
 [rfc4180](http://tools.ietf.org/rfc/rfc4180.txt)
@@ -31,11 +37,11 @@ TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
 Consume the next input character:
 - **"," (U+002C)**
   - [Emit the current field](#emit-the-current-field).
-- **CR (U+000D)**
+- **CR (U+000D) - CR or CRLF**
   - [Emit the current field](#emit-the-current-field).
   - [Emit the current record](#emit-the-current-record).
   - Switch to [data CR state](#data-cr-state).
-- **LF (U+000A) - Unix/Linux newline**
+- **LF (U+000A) - LF, Unix/Linux newline**
   - [Emit the current field](#emit-the-current-field).
   - [Emit the current record](#emit-the-current-record).
 - **U+0022 QUOTATION MARK (")**
@@ -52,11 +58,11 @@ Consume the next input character:
 (Old Mac newline compatibility.)
 
 Consume the next input character:
-- **LF (U+000A) - Windows newline**
+- **LF (U+000A) - CRLF, Windows newline**
   - Switch to [data state](#data-state).
 - **EOF**
   - End of tokenization.
-- **Anything else - Old Mac newline**
+- **Anything else - CR, old Mac newline**
   - Switch to [data state](#data-state).
   - Reconsume the current input character.
 
@@ -78,10 +84,10 @@ Consume the next input character:
 Consume the next input character:
 - **U+0022 QUOTATION MARK (")**
   - Switch to [quoted field quote state](#quoted-field-quote-state).
-- **CR (U+000D)**
+- **CR (U+000D) - CR or CRLF**
   - Append CRLF to the current field.
   - Switch to [quoted field CR state](#quoted-field-cr-state).
-- **LF (U+000A) - Unix/Linux newline**
+- **LF (U+000A) - LF, Unix/Linux newline**
   - Append CRLF to the current field.
 - **EOF**
   - [Emit the current field](#emit-the-current-field).
@@ -112,15 +118,13 @@ Consume the next input character:
 (Old Mac newline compatibility.)
 
 Consume the next input character:
-- **LF (U+000A)**
-  - Windows newline.
+- **LF (U+000A) - CRLF, Windows newline**
   - Switch to [quoted field state](#quoted-field-state).
 - **EOF**
   - If the current field is not null, [emit the current field](#emit-the-current-field).
   - If the current record is not null, [emit the current record](#emit-the-current-record).
   - End of tokenization.
-- **Anything else**
-  - Old Mac newline.
+- **Anything else - CR, old Mac newline**
   - Switch to [quoted field state](#quoted-field-state).
   - Reconsume the current input character.
 
