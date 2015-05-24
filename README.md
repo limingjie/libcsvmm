@@ -33,8 +33,9 @@ Consume the next input character:
 - **"," (U+002C)**
   - [Emit the current field](#emit-the-current-field).
 - **CR (U+000D)**
-  - Unix/Linux newline.
+  - Switch to [data CR state](#data-cr-state).
 - **LF (U+000A)**
+  - Unix/Linux newline.
   - [Emit the current field](#emit-the-current-field).
   - [Emit the current record](#emit-the-current-record).
 - **U+0022 QUOTATION MARK (")**
@@ -73,8 +74,9 @@ Consume the next input character:
 - **U+0022 QUOTATION MARK (")**
   - Switch to [quoted field quote state](#quoted-field-quote-state).
 - **CR (U+000D)**
-  - Unix/Linux newline.
+  - Switch to [quoted field CR state](#quoted-field-cr-state).
 - **LF (U+000A)**
+  - Unix/Linux newline.
   - Append CRLF to the current field.
 - **Anything else**
   - Append the current input character to the current field.
