@@ -70,5 +70,5 @@ public:
     std::string to_string(size_t row);
 
     // serialize mth field of nth record to string.
-    std::string to_string(size_t row, size_t column);
+    std::string to_string(size_t row, size_t column, bool raw = false);
 };

@@ -307,14 +307,21 @@ std::string csvmm::to_string(size_t row)
     return oss.str();
 }
 
-std::string csvmm::to_string(size_t row, size_t column)
+std::string csvmm::to_string(size_t row, size_t column, bool raw)
 {
-    std::ostringstream oss;
-
     if (row < _csv.size() && column < _csv[row].size())
     {
-        _write_field(oss, _csv[row][column], false);
+        if (raw)
+        {
+            return _csv[row][column];
+        }
+        else
+        {
+            std::ostringstream oss;
+            _write_field(oss, _csv[row][column], false);
+            return oss.str();
+        }
     }
 
-    return oss.str();
+    return "";
 }
