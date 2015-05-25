@@ -28,8 +28,14 @@ void read_std_input()
 
     if (csv.read(std::cin))
     {
-        csv.write(std::cout);
-        csv.write("binary.csv");
+        for (size_t record = 0; record < csv.size(); ++record)
+        {
+            for (size_t field = 0; field < csv.size(record); ++field)
+            {
+                std::cerr << "field [" << record << ", " << field << "] = "
+                    << csv.to_string(record, field, true) << std::endl;
+            }
+        }
     }
 }
 
@@ -40,7 +46,8 @@ void read_file(const std::string &filename)
     if (csv.read(filename))
     {
         csv.write(std::cout);
-        csv.write("binary.csv");
+        csv.erase(3).erase(2, 2);
+        csv.write(std::cout);
     }
     else
     {

@@ -271,6 +271,31 @@ bool csvmm::write(const std::string &filename)
     return false;
 }
 
+csvmm& csvmm::erase(size_t row)
+{
+    if (row < _csv.size())
+    {
+        _csv.erase(_csv.begin() + row);
+    }
+
+    return *this;
+}
+
+csvmm& csvmm::erase(size_t row, size_t column)
+{
+    if (row < _csv.size() && column < _csv[row].size())
+    {
+        _csv[row].erase(_csv[row].begin() + column);
+    }
+
+    return *this;
+}
+
+void csvmm::clear()
+{
+    _csv.clear();
+}
+
 size_t csvmm::size()
 {
     return _csv.size();

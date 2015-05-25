@@ -57,6 +57,15 @@ public:
     // write csv file, make sure newline as CRLF.
     bool write(const std::string &filename);
 
+    // erase record.
+    csvmm& erase(size_t row);
+
+    // erase field.
+    csvmm& erase(size_t row, size_t column);
+
+    // clear all data
+    void clear();
+
     // return number of records.
     size_t size();
 
