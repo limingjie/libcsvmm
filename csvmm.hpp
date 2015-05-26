@@ -57,11 +57,17 @@ public:
     // write csv file, make sure newline as CRLF.
     bool write(const std::string &filename);
 
+    // insert a record before nth record.
+    bool insert(size_t row);
+
+    // insert a field before mth field of nth record.
+    bool insert(size_t row, size_t column, const std::string &field);
+
     // erase record.
-    csvmm& erase(size_t row);
+    bool erase(size_t row);
 
     // erase field.
-    csvmm& erase(size_t row, size_t column);
+    bool erase(size_t row, size_t column);
 
     // clear all data
     void clear();
@@ -81,3 +87,5 @@ public:
     // serialize mth field of nth record to string.
     std::string to_string(size_t row, size_t column, bool raw = false);
 };
+
+

@@ -46,7 +46,16 @@ void read_file(const std::string &filename)
     if (csv.read(filename))
     {
         csv.write(std::cout);
-        csv.erase(3).erase(2, 2);
+        csv.erase(3);
+        csv.erase(2, 2);
+        csv.insert(3);
+        csv.insert(3, 0, "0000000");
+        csv.insert(3, 1, "1111111");
+        csv.insert(3, 2, " \"hello\r\nworld\"   ");
+        csv.insert(8);
+        csv.insert(8, 0, "the last record");
+        csv.insert(8, 0, "");
+        csv.insert(8, 0, "");
         csv.write(std::cout);
     }
     else

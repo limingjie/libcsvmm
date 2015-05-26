@@ -271,24 +271,51 @@ bool csvmm::write(const std::string &filename)
     return false;
 }
 
-csvmm& csvmm::erase(size_t row)
+bool csvmm::insert(size_t row)
+{
+    if (row <= _csv.size())
+    {
+        record_t record;
+        _csv.insert(_csv.begin() + row, record);
+        return true;
+    }
+
+    return false;
+}
+
+bool csvmm::insert(size_t row, size_t column, const std::string &field)
+{
+    if (row < _csv.size() && column <= _csv[row].size())
+    {
+        _csv[row].insert(_csv[row].begin() + column, field);
+        return true;
+    }
+
+    return false;
+}
+
+bool csvmm::erase(size_t row)
 {
     if (row < _csv.size())
     {
         _csv.erase(_csv.begin() + row);
+
+        return true;
     }
 
-    return *this;
+    return false;
 }
 
-csvmm& csvmm::erase(size_t row, size_t column)
+bool csvmm::erase(size_t row, size_t column)
 {
     if (row < _csv.size() && column < _csv[row].size())
     {
         _csv[row].erase(_csv[row].begin() + column);
+
+        return true;
     }
 
-    return *this;
+    return false;
 }
 
 void csvmm::clear()
