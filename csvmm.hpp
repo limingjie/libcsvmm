@@ -4,6 +4,8 @@
 // May 24, 2015 - by Mingjie Li (limingjie@outlook.com)
 // https://github.com/limingjie/libcsvmm
 //
+#ifndef __CSV_MM__
+#define __CSV_MM__
 
 #include <iostream>
 #include <fstream>
@@ -88,4 +90,4 @@ public:
     std::string to_string(size_t row, size_t column, bool raw = false);
 };
 
-
+#endif // __CSV_MM__
